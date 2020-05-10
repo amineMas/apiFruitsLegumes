@@ -7,7 +7,14 @@ use App\Repository\LegumesRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *      collectionOperations={"get", "post"},
+ *      itemOperations={
+ *          "get"={"path"="/legume/{id}"},
+ *          "put"
+ *      }
+ * 
+ * )
  * @ORM\Entity(repositoryClass=LegumesRepository::class)
  */
 class Legumes
