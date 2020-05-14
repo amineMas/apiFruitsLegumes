@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    
+    <button onclick="call()">afficher liste </button>
+
+    <label for="nom">chercher un fruit</label>
+    <input type="text" id="nom">
+    <button onclick="fetchFruit()"> Rechercher </button>
+
+    <div id="content">
+        <p id="nomFruit">Name: </p>
+        <p id="rank">Rank: </p>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+    let call = () => {
+        fetch('https://localhost:8000/api/fruits')
+        .then(function(response) {
+            response.json().then(function(data) {
+                var fruits = data['hydra:member'];
+                for (let i = 0; i < fruits.length; i++) {
+                    let nom = document.createElement('p');
+                    nom.setAttribute('class', 'nom');
+                    let taux = document.createElement('p');
+                    taux.setAttribute('class', 'taux');
+
+                    nom.textContent = fruits[i]['nom'];
+                    taux.textContent = fruits[i].tauxPesticides;
+
+                    document.body.appendChild(nom);
+                    document.body.appendChild(taux);
+                    document.createElement('hr');
+                }
+            });
+        })
+        .catch(function(err) {
+            console.log("Erreur : " + err);
+        })
+    }
+
+    let fetchFruit = () => {
+        let fruit = document.getElementById("nom").value;
+        fetch(`https://localhost:8000/api/fruits?nom=${fruit}`)
+        .then(function(response) {
+            response.json().then(function(data) {
+                let objet = data['hydra:member'][0];
+                let nom = document.createTextNode(objet.nom);
+                let rang = document.createTextNode(objet.rang);
+                document.getElementById('nomFruit').appendChild(nom);
+                document.getElementById('rank').appendChild(rang);
+            });
+        })
+    }
+        
+    </script>
+{% endblock %}

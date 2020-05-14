@@ -2,9 +2,13 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\FruitsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\FruitsRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter;
 
 /**
  * @ApiResource(
@@ -12,8 +16,12 @@ use Doctrine\ORM\Mapping as ORM;
  *     itemOperations={
  *          "get"={"path"="/fruit/{id}"},
  *          "put"
- *     }
+ *     },
+ *     normalizationContext={"groups"={"fruit_listing:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"fruit_listing:write"}}
  * )
+ * @ApiFilter(SearchFilter::class, properties={"nom": "partial"})
+ * @ApiFilter(RangeFilter::class, properties={"tauxPesticides"})
  * @ORM\Entity(repositoryClass=FruitsRepository::class)
  */
 class Fruits
@@ -28,6 +36,7 @@ class Fruits
     /**
      * Nom du fruit
      * @ORM\Column(type="string", length=255)
+     * @Groups({"fruit_listing:read", "fruit_listing:write"})
      */
     private $nom;
 
@@ -35,6 +44,7 @@ class Fruits
      * Classement du fruit selon le taux d'échantillons contenant des résidus de pesticides du plus contaminé au moins contaminé
      * 
      * @ORM\Column(type="integer")
+     * @Groups({"fruit_listing:read", "fruit_listing:write"})
      */
     private $rang;
 
@@ -42,6 +52,7 @@ class Fruits
      * taux d'échantillons contenant des résidus de pesticides divisé par 100
      * 
      * @ORM\Column(type="decimal", precision=4, scale=3)
+     * @Groups({"fruit_listing:read", "fruit_listing:write"})
      */
     private $tauxPesticides;
 
@@ -76,7 +87,7 @@ class Fruits
 
     public function getTauxPesticides(): ?string
     {
-        return $this->tauxPesticides;
+        return $this->tauxPesticides * 100;
     }
 
     public function setTauxPesticides(string $tauxPesticides): self
