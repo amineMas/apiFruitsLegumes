@@ -7,8 +7,9 @@ use App\Repository\FruitsRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter;
 
 /**
  * @ApiResource(
@@ -18,10 +19,14 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter;
  *          "put"
  *     },
  *     normalizationContext={"groups"={"fruit_listing:read"}, "swagger_definition_name"="Read"},
- *     denormalizationContext={"groups"={"fruit_listing:write"}}
+ *     denormalizationContext={"groups"={"fruit_listing:write"}},
+ *     attributes={
+ *          "pagination_items_per_page"=10
+ *     }
  * )
  * @ApiFilter(SearchFilter::class, properties={"nom": "partial"})
- * @ApiFilter(RangeFilter::class, properties={"tauxPesticides"})
+ * @ApiFilter(OrderFilter::class, properties={"rang"}, arguments={"orderParameterName"="order"})
+ * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=FruitsRepository::class)
  */
 class Fruits

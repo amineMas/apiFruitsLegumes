@@ -2,19 +2,23 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\LegumesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\LegumesRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ApiResource(
  *      collectionOperations={"get", "post"},
  *      itemOperations={
- *          "get"={"path"="/legume/{id}"},
+ *          "get",
  *          "put"
  *      }
- * 
  * )
+ * @ApiFilter(SearchFilter::class, properties={"nom": "partial"})
+ * @ApiFilter(OrderFilter::class, properties={"rang"}, arguments={"orderParameterName"="order"})
  * @ORM\Entity(repositoryClass=LegumesRepository::class)
  */
 class Legumes
