@@ -7,6 +7,7 @@ use App\Repository\FruitsRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -21,7 +22,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *     normalizationContext={"groups"={"fruit_listing:read"}, "swagger_definition_name"="Read"},
  *     denormalizationContext={"groups"={"fruit_listing:write"}},
  *     attributes={
- *          "pagination_items_per_page"=10
+ *          "pagination_items_per_page"=10,
+ *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}}
  *     }
  * )
  * @ApiFilter(SearchFilter::class, properties={"nom": "partial"})
@@ -42,6 +44,12 @@ class Fruits
      * Nom du fruit
      * @ORM\Column(type="string", length=255)
      * @Groups({"fruit_listing:read", "fruit_listing:write"})
+     * @Assert\NotBlank()
+     * @Assert\Length(
+     *      min=4,
+     *      max=50,
+     *      maxMessage="Le fruit doit contenir 50 caractères ou moins"
+     * )
      */
     private $nom;
 
@@ -50,6 +58,7 @@ class Fruits
      * 
      * @ORM\Column(type="integer")
      * @Groups({"fruit_listing:read", "fruit_listing:write"})
+     * @Assert\NotBlank()
      */
     private $rang;
 
@@ -58,6 +67,7 @@ class Fruits
      * 
      * @ORM\Column(type="decimal", precision=4, scale=3)
      * @Groups({"fruit_listing:read", "fruit_listing:write"})
+     * @Assert\NotBlank()
      */
     private $tauxPesticides;
 

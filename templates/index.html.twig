@@ -16,10 +16,13 @@
 
 {% block javascripts %}
     <script>
+    /* let myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json"); */
     let call = () => {
         fetch('https://localhost:8000/api/fruits')
         .then(function(response) {
             response.json().then(function(data) {
+                //console.log(data);throw new Error("my error message");
                 var fruits = data['hydra:member'];
                 for (let i = 0; i < fruits.length; i++) {
                     let nom = document.createElement('p');
