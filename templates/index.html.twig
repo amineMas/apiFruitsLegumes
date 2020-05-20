@@ -1,21 +1,49 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <div class="container">
+        <h2>Rechercher un fruit</h2>
+        <nav class="navbar navbar-light bg-light mt-3">
+            <form class="form-inline">
+                <input id="nom" class="form-control mr-sm-2" type="search" placeholder="Entrez le nom du fruit" aria-label="Search">
+                <button id="search" class="btn btn-outline-success my-2 my-sm-0" type="submit">Rechercher</button>
+            </form>
+        </nav>
+
+        <div class="mt-5" id="content">
+            <p id="nomFruit">Nom: </p>
+            <p id="tauxPesticides">Taux: </p>
+            <p id="rank">Rang: </p>
+        </div>
+
+        <h2 class="text-center mb-4">Afficher tout les fruits</h2>
+        <button type="button" class="btn btn-outline-success btn-lg btn-block" onclick="call()">Afficher</button>
+
+        {# <button onclick="call()">afficher liste </button> #}
+        <div class="row mt-5" id="row">
     
-    <button onclick="call()">afficher liste </button>
+        </div>
 
-    <label for="nom">chercher un fruit</label>
-    <input type="text" id="nom">
-    <button onclick="fetchFruit()"> Rechercher </button>
-
-    <div id="content">
-        <p id="nomFruit">Name: </p>
-        <p id="rank">Rank: </p>
     </div>
+
+    
+
+    {# <label for="nom">chercher un fruit</label>
+    <input type="text" id="nom">
+    <button onclick="fetchFruit()"> Rechercher </button> #}
+
+    
 {% endblock %}
 
 {% block javascripts %}
     <script>
+
+    document.querySelector('#search').addEventListener('click', (e) => {
+        e.preventDefault();
+        //console.log(e.target);
+        //console.log(e.currentTarget.previousElementSibling.value);
+        fetchFruit(e);
+    })
     /* let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json"); */
     let call = () => {
@@ -25,17 +53,18 @@
                 //console.log(data);throw new Error("my error message");
                 var fruits = data['hydra:member'];
                 for (let i = 0; i < fruits.length; i++) {
-                    let nom = document.createElement('p');
-                    nom.setAttribute('class', 'nom');
+                    let divElem = document.createElement('div');
+                    divElem.classList.add('col-lg-3', 'my-4');
+                    let nom = document.createElement('h4');
+                    nom.classList.add('text-center');
                     let taux = document.createElement('p');
-                    taux.setAttribute('class', 'taux');
+                    taux.classList.add('text-center');
 
                     nom.textContent = fruits[i]['nom'];
-                    taux.textContent = fruits[i].tauxPesticides;
-
-                    document.body.appendChild(nom);
-                    document.body.appendChild(taux);
-                    document.createElement('hr');
+                    taux.textContent = `${fruits[i].tauxPesticides} %`;
+                    let rowElem = document.getElementById('row');
+                    divElem.append(nom, taux);
+                    rowElem.append(divElem);
                 }
             });
         })
@@ -44,16 +73,33 @@
         })
     }
 
-    let fetchFruit = () => {
-        let fruit = document.getElementById("nom").value;
+    let fetchFruit = (e) => {
+        //console.log(e.currentTarget.previousElementSibling.value);
+        let fruit = e.currentTarget.previousElementSibling.value;
         fetch(`https://localhost:8000/api/fruits?nom=${fruit}`)
         .then(function(response) {
             response.json().then(function(data) {
+                //console.log(data['hydra:member'][0]);
                 let objet = data['hydra:member'][0];
                 let nom = document.createTextNode(objet.nom);
-                let rang = document.createTextNode(objet.rang);
-                document.getElementById('nomFruit').appendChild(nom);
-                document.getElementById('rank').appendChild(rang);
+                let tauxPesticides = document.createTextNode(objet.tauxPesticides + '%');
+                let rang = document.createTextNode(objet.rang + '/18');
+                let elemNom = document.getElementById('nomFruit');
+                let elemTaux = document.getElementById('tauxPesticides');
+                let elemRang = document.getElementById('rank');
+                // reset the p from the next research
+                if(elemNom.childNodes.length > 1) {
+                    elemNom.removeChild(elemNom.lastChild)
+                };
+                if(elemRang.childNodes.length > 1) {
+                    elemRang.removeChild(elemRang.lastChild)
+                };
+                if(elemTaux.childNodes.length > 1) {
+                    elemTaux.removeChild(elemTaux.lastChild)
+                };
+                elemNom.appendChild(nom);
+                elemTaux.appendChild(tauxPesticides);
+                elemRang.appendChild(rang);
             });
         })
     }

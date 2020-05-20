@@ -22,7 +22,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *     normalizationContext={"groups"={"fruit_listing:read"}, "swagger_definition_name"="Read"},
  *     denormalizationContext={"groups"={"fruit_listing:write"}},
  *     attributes={
- *          "pagination_items_per_page"=10,
+ *          "pagination_items_per_page"=20,
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}}
  *     }
  * )
