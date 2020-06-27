@@ -71,6 +71,13 @@ class Fruits
      */
     private $tauxPesticides;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="fruits")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"fruit_listing:read", "fruit_listing:write"})
+     */
+    private $author;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -108,6 +115,18 @@ class Fruits
     public function setTauxPesticides(string $tauxPesticides): self
     {
         $this->tauxPesticides = $tauxPesticides;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }

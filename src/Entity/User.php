@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -55,6 +57,17 @@ class User implements UserInterface
      * @Assert\NotBlank()
      */
     private $pseudo;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Fruits::class, mappedBy="author")
+     * @Groups({"user:read"})
+     */
+    private $fruits;
+
+    public function __construct()
+    {
+        $this->fruits = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -142,6 +155,37 @@ class User implements UserInterface
     public function setPseudo(string $pseudo): self
     {
         $this->pseudo = $pseudo;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Fruits[]
+     */
+    public function getFruits(): Collection
+    {
+        return $this->fruits;
+    }
+
+    public function addFruit(Fruits $fruit): self
+    {
+        if (!$this->fruits->contains($fruit)) {
+            $this->fruits[] = $fruit;
+            $fruit->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFruit(Fruits $fruit): self
+    {
+        if ($this->fruits->contains($fruit)) {
+            $this->fruits->removeElement($fruit);
+            // set the owning side to null (unless already changed)
+            if ($fruit->getAuthor() === $this) {
+                $fruit->setAuthor(null);
+            }
+        }
 
         return $this;
     }
