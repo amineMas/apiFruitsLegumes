@@ -3,14 +3,17 @@
 namespace App\Entity;
 
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Security\Core\User\UserInterface;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
@@ -18,6 +21,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      normalizationContext={"groups"={"user:read"}},
  *      denormalizationContext={"groups"={"user:write"}},
  * )
+ * @ApiFilter(PropertyFilter::class)
  * @UniqueEntity(fields={"email"})
  * @UniqueEntity(fields={"pseudo"})
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -53,14 +57,15 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
-     * @Groups({"user:read", "user:write"})
+     * @Groups({"user:read", "user:write", "fruits_listing:item:get", "fruits_listing:write"})
      * @Assert\NotBlank()
      */
     private $pseudo;
 
     /**
-     * @ORM\OneToMany(targetEntity=Fruits::class, mappedBy="author")
-     * @Groups({"user:read"})
+     * @ORM\OneToMany(targetEntity=Fruits::class, mappedBy="author", cascade={"persist"})
+     * @Groups({"user:read", "user:write"})
+     * @Assert\Valid()
      */
     private $fruits;
 

@@ -16,7 +16,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  * @ApiResource(
  *     collectionOperations={"get", "post"},
  *     itemOperations={
- *          "get"={"path"="/fruit/{id}"},
+ *          "get"={
+ *              "normalization_context"={"groups"={"fruit_listing:read", "fruits_listing:item:get"}},
+ *          },
  *          "put"
  *     },
  *     normalizationContext={"groups"={"fruit_listing:read"}, "swagger_definition_name"="Read"},
@@ -26,7 +28,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}}
  *     }
  * )
- * @ApiFilter(SearchFilter::class, properties={"nom": "partial"})
+ * @ApiFilter(SearchFilter::class, properties={
+ *      "nom": "partial",
+ *      "author": "exact",
+ *      "author.pseudo": "partial"
+ * })
  * @ApiFilter(OrderFilter::class, properties={"rang"}, arguments={"orderParameterName"="order"})
  * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=FruitsRepository::class)
@@ -43,7 +49,7 @@ class Fruits
     /**
      * Nom du fruit
      * @ORM\Column(type="string", length=255)
-     * @Groups({"fruit_listing:read", "fruit_listing:write"})
+     * @Groups({"fruit_listing:read", "fruit_listing:write", "user:read", "user:write"})
      * @Assert\NotBlank()
      * @Assert\Length(
      *      min=4,
@@ -57,7 +63,7 @@ class Fruits
      * Classement du fruit selon le taux d'échantillons contenant des résidus de pesticides du plus contaminé au moins contaminé
      * 
      * @ORM\Column(type="integer")
-     * @Groups({"fruit_listing:read", "fruit_listing:write"})
+     * @Groups({"fruit_listing:read", "fruit_listing:write", "user:read","user:write"})
      * @Assert\NotBlank()
      */
     private $rang;
@@ -66,7 +72,7 @@ class Fruits
      * taux d'échantillons contenant des résidus de pesticides divisé par 100
      * 
      * @ORM\Column(type="decimal", precision=4, scale=3)
-     * @Groups({"fruit_listing:read", "fruit_listing:write"})
+     * @Groups({"fruit_listing:read", "fruit_listing:write", "user:write"})
      * @Assert\NotBlank()
      */
     private $tauxPesticides;
